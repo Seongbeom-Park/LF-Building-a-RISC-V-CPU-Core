@@ -32,7 +32,11 @@ makerchip riscv.tlv
   <img src="images/decode_logic/Instruction_decode_table__with_needed_instructions_circled.png">
 </details>
 
-4. Register file read
+<details>
+  <summary>4. Register file read</summary>
+  <img src="images/register_file_read/The_provided_register_file_instantiation__before_you_modify_it_.png">
+</details>
+
 5. ALU
 6. Register file write
 7. DMem
