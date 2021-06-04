@@ -24,7 +24,14 @@ makerchip riscv.tlv
   <img src="images/fetch/Instruction_memory_hookup.png">
 </details>
 
-3. Decode logic
+<details>
+  <summary>3. Decode logic</summary>
+  <img src="images/decode_logic/Base_instruction_formats_showing_immediate_variants.png">
+  <img src="images/decode_logic/Instruction_types_from_opcode_6-2___instr_6-2__.png">
+  <img src="images/decode_logic/imm.png">
+  <img src="images/decode_logic/Instruction_decode_table__with_needed_instructions_circled.png">
+</details>
+
 4. Register file read
 5. ALU
 6. Register file write
