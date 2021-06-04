@@ -90,8 +90,12 @@
    $is_addi = $dec_bits ==? 11'bx_000_0010011;
    $is_add  = $dec_bits ==? 11'b0_000_0110011;
    
-   `BOGUS_USE($rs2 $rs1 $rd $rs2_valid $rs1_valid $rd_valid $imm_valid);
-   `BOGUS_USE($is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $is_addi $is_add)
+   // register file read
+   m4+rf(32, 32, $reset, $rd_valid, $rd, $wr_data[31:0], $rs1_valid, $rs1, $rd1_data, $rs2_valid, $rs2, $rd2_data)
+   
+   `BOGUS_USE($imm_valid);
+   `BOGUS_USE($is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $is_addi $is_add $imm)
+   `BOGUS_USE($wr_data $rd1_data $rd2_data)
    
    // Assert these to end simulation (before Makerchip cycle limit).
    *passed = 1'b0;
