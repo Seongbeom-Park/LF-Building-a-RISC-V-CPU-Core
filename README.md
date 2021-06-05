@@ -39,4 +39,48 @@ makerchip riscv.tlv
 
 5. ALU
 6. Register file write
-7. DMem
+
+<details>
+  <summary>7. Branch logic</summary>
+  <img src="images/branch_logic/Branch_logic_in_greater_detail.png">
+  <table>
+    <tr>
+      <th>Instruction</th>
+      <th>Meaning</th>
+      <th>Condition Expression</th>
+    </tr>
+    <tr>
+      <td>BEQ</td>
+      <td>Branch if equal</td>
+      <td>x1 == x2</td>
+    </tr>
+    <tr>
+      <td>BNE</td>
+      <td>Branch if not equal</td>
+      <td>x1 != x2</td>
+    </tr>
+    <tr>
+      <td>BLT</td>
+      <td>Branch if less than</td>
+      <td>(x1 < x2) ^ (x1[31] != x2[31])</td>
+    </tr>
+    <tr>
+      <td>BGE</td>
+      <td>Branch if greater than or equal</td>
+      <td>(x1 >= x2) ^ (x1[31] != x2[31])</td>
+    </tr>
+    <tr>
+      <td>BLTU</td>
+      <td>Branch if less than, unsigned</td>
+      <td>x1 < x2</td>
+    </tr>
+    <tr>
+      <td>BGEU</td>
+      <td>Branch if greater than or equal, unsigned</td>
+      <td>x1 >= x2</td>
+    </tr>
+  </table>
+  <img src="images/branch_logic/Branch_taken_logic_diagram.png">
+</details>
+
+8. DMem
