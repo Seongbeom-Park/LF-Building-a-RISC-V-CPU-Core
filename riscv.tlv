@@ -95,9 +95,9 @@
    m4+rf(32, 32, $reset, $rd_en, $rd, $wr_data[31:0], $rs1_valid, $rs1, $src1_value[31:0], $rs2_valid, $rs2, $src2_value[31:0])
    
    // alu
-   $result[31:0] = $is_addi ? $src1_value + $imm :
-                   $is_add  ? $src1_value + $src2_value :
-                   32'b0;
+   // $result[31:0] = $is_addi ? $src1_value + $imm :
+   //                 $is_add  ? $src1_value + $src2_value :
+   //                 32'b0;
    
    // register file write
    $wr_data[31:0] = $result;
@@ -130,7 +130,7 @@
    $is_sh    = $dec_bits ==? 11'bx_001_0100011;
    $is_sw    = $dec_bits ==? 11'bx_010_0100011;
    $is_slti  = $dec_bits ==? 11'bx_010_0010011;
-   $is_lstiu = $dec_bits ==? 11'bx_011_0010011;
+   $is_sltiu = $dec_bits ==? 11'bx_011_0010011;
    $is_xori  = $dec_bits ==? 11'bx_100_0010011;
    $is_ori   = $dec_bits ==? 11'bx_110_0010011;
    $is_andi  = $dec_bits ==? 11'bx_111_0010011;
@@ -149,9 +149,46 @@
    
    $is_load = $is_lui || $is_lb || $is_lh || $is_lw || $is_lbu || $is_lhu;
    
+   // alu c5
+   // SLTU and SLTI (set if less than, unsigned) result:
+   $sltu_rslt[31:0] = { 31'b0, $src1_value < $src2_value };
+   $sltiu_rslt[31:0] = { 31'b0, $src1_value < $imm };
+   
+   // SRA and ARAI (shift right, arithmetic) result:
+   //   sign-extended src1
+   $sext_src1[63:0] = { {32{$src1_value[31]}}, $src1_value };
+   //   64-bit sign-extended results, to be truncated
+   $sra_rslt[63:0] = $sext_src1 >> $src2_value[4:0];
+   $srai_rslt[63:0] = $sext_src1 >> $imm[4:0];
+   
+   $result[31:0] = $is_andi  ? ($src1_value & $imm) :
+                   $is_ori   ? ($src1_value | $imm) :
+                   $is_xori  ? ($src1_value ^ $imm) :
+                   $is_addi  ? ($src1_value + $imm) :
+                   $is_slli  ? ($src1_value << $imm[5:0]) :
+                   $is_srli  ? ($src1_value >> $imm[5:0]) :
+                   $is_and   ? ($src1_value & $src2_value) :
+                   $is_or    ? ($src1_value | $src2_value) :
+                   $is_xor   ? ($src1_value ^ $src2_value) :
+                   $is_add   ? ($src1_value + $src2_value) :
+                   $is_sub   ? ($src1_value - $src2_value) :
+                   $is_sll   ? ($src1_value << $src2_value) :
+                   $is_srl   ? ($src1_value >> $src2_value) :
+                   $is_sltu  ? $sltu_rslt :
+                   $is_sltiu ? $sltiu_rslt :
+                   $is_lui   ? { $imm[31:12], 12'b0 } :
+                   $is_auipc ? ($pc + $imm) :
+                   $is_jal   ? ($pc + 32'd4) :
+                   $is_jalr  ? ($pc + 32'd4) :
+                   $is_slt   ? (($src1_value[31] == $src2_value[31]) ? $sltu_rslt : { 31'b0, $src1_value[31] }) :
+                   $is_slti  ? (($src1_value[31] == $imm[31]) ? $sltu_rslt : { 31'b0, $src1_value[31] }) :
+                   $is_sra   ? $sra_rslt[31:0] :
+                   $is_srai  ? $srai_rslt[31:0] :
+                   32'b0;
+   
+   
    `BOGUS_USE($imm_valid);
-   `BOGUS_USE($is_auipc $is_jal $is_jalr $is_sb $is_sh $is_sw $is_slti $is_lstiu $is_xori $is_ori $is_andi $is_slli $is_srli $is_srai);
-   `BOGUS_USE($is_sub $is_sll $is_slt $is_sltu $is_xor $is_srl $is_sra $is_or $is_and);
+   `BOGUS_USE($is_sb $is_sh $is_sw);
    `BOGUS_USE($is_load);
    
    // Assert these to end simulation (before Makerchip cycle limit).
