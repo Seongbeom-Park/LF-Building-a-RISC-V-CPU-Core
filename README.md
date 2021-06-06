@@ -85,4 +85,11 @@ makerchip riscv.tlv
 </details>
 
 ### Chapter 5. Completing Your RISC-V CPU
-8. DMem
+<details>
+  <summary>8. Decode logic</summary>
+  <img src="images/decode_logic/Instruction_decode_table__with_needed_instructions_circled.png">
+</details>
+
+9. ALU
+10. Jump logic
+11. DMem
