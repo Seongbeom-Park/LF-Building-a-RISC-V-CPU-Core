@@ -112,9 +112,9 @@
                $is_bgeu ? $src1_value >= $src2_value :
                1'b0;
    $br_tgt_pc[31:0] = $pc + $imm;
-   $next_pc[31:0] = $reset ? 0 :
-                    $taken_br ? $br_tgt_pc :
-                    ($pc + 32'd4);
+   // $next_pc[31:0] = $reset ? 0 :
+   //                  $taken_br ? $br_tgt_pc :
+   //                  ($pc + 32'd4);
    
    // decode logic chapter 5
    $is_lui   = $dec_bits ==? 11'bx_xxx_0110111;
@@ -185,6 +185,15 @@
                    $is_sra   ? $sra_rslt[31:0] :
                    $is_srai  ? $srai_rslt[31:0] :
                    32'b0;
+   
+   // jump logic
+   $jalr_tgt_pc[31:0] = $src1_value + $imm;
+   $next_pc[31:0] = $reset ? 0 :
+                    $taken_br ? $br_tgt_pc :
+                    $is_jal ? $br_tgt_pc :
+                    $is_jalr ? $jalr_tgt_pc :
+                    ($pc + 32'd4);
+   
    
    
    `BOGUS_USE($imm_valid);
