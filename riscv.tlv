@@ -39,7 +39,9 @@
    
    // pc_logic
    $pc[31:0] = >>1$next_pc;
-   // $next_pc[31:0] = $reset ? 0 : ($pc + 32'd4);
+   /*
+   $next_pc[31:0] = $reset ? 0 : ($pc + 32'd4);
+   */
    
    // fetch
    `READONLY_MEM($pc, $$instr[31:0]);
@@ -92,15 +94,19 @@
    $is_add  = $dec_bits ==? 11'b0_000_0110011;
    
    // register file read
-   m4+rf(32, 32, $reset, $rd_en, $rd, $wr_data[31:0], $rs1_valid, $rs1, $src1_value[31:0], $rs2_valid, $rs2, $src2_value[31:0])
+   m4+rf(32, 32, $reset, $rd_en, $rd, $wr_data, $rs1_valid, $rs1, $src1_value[31:0], $rs2_valid, $rs2, $src2_value[31:0])
    
    // alu
-   // $result[31:0] = $is_addi ? $src1_value + $imm :
-   //                 $is_add  ? $src1_value + $src2_value :
-   //                 32'b0;
+   /*
+   $result[31:0] = $is_addi ? $src1_value + $imm :
+                   $is_add  ? $src1_value + $src2_value :
+                   32'b0;
+   */
    
    // register file write
+   /*
    $wr_data[31:0] = $result;
+   */
    $rd_en = $rd_valid && ($rd != 5'b0);
    
    // branch logic
@@ -112,9 +118,11 @@
                $is_bgeu ? $src1_value >= $src2_value :
                1'b0;
    $br_tgt_pc[31:0] = $pc + $imm;
-   // $next_pc[31:0] = $reset ? 0 :
-   //                  $taken_br ? $br_tgt_pc :
-   //                  ($pc + 32'd4);
+   /*
+   $next_pc[31:0] = $reset ? 0 :
+                    $taken_br ? $br_tgt_pc :
+                    ($pc + 32'd4);
+   */
    
    // decode logic chapter 5
    $is_lui   = $dec_bits ==? 11'bx_xxx_0110111;
@@ -161,6 +169,7 @@
    $sra_rslt[63:0] = $sext_src1 >> $src2_value[4:0];
    $srai_rslt[63:0] = $sext_src1 >> $imm[4:0];
    
+   /*
    $result[31:0] = $is_andi  ? ($src1_value & $imm) :
                    $is_ori   ? ($src1_value | $imm) :
                    $is_xori  ? ($src1_value ^ $imm) :
@@ -185,6 +194,7 @@
                    $is_sra   ? $sra_rslt[31:0] :
                    $is_srai  ? $srai_rslt[31:0] :
                    32'b0;
+   */
    
    // jump logic
    $jalr_tgt_pc[31:0] = $src1_value + $imm;
@@ -194,11 +204,40 @@
                     $is_jalr ? $jalr_tgt_pc :
                     ($pc + 32'd4);
    
+   // dmem
+   $result[31:0] = $is_andi    ? ($src1_value & $imm) :
+                   $is_ori     ? ($src1_value | $imm) :
+                   $is_xori    ? ($src1_value ^ $imm) :
+                   $is_addi    ? ($src1_value + $imm) :
+                   $is_slli    ? ($src1_value << $imm[5:0]) :
+                   $is_srli    ? ($src1_value >> $imm[5:0]) :
+                   $is_and     ? ($src1_value & $src2_value) :
+                   $is_or      ? ($src1_value | $src2_value) :
+                   $is_xor     ? ($src1_value ^ $src2_value) :
+                   $is_add     ? ($src1_value + $src2_value) :
+                   $is_sub     ? ($src1_value - $src2_value) :
+                   $is_sll     ? ($src1_value << $src2_value) :
+                   $is_srl     ? ($src1_value >> $src2_value) :
+                   $is_sltu    ? $sltu_rslt :
+                   $is_sltiu   ? $sltiu_rslt :
+                   $is_lui     ? { $imm[31:12], 12'b0 } :
+                   $is_auipc   ? ($pc + $imm) :
+                   $is_jal     ? ($pc + 32'd4) :
+                   $is_jalr    ? ($pc + 32'd4) :
+                   $is_slt     ? (($src1_value[31] == $src2_value[31]) ? $sltu_rslt : { 31'b0, $src1_value[31] }) :
+                   $is_slti    ? (($src1_value[31] == $imm[31]) ? $sltu_rslt : { 31'b0, $src1_value[31] }) :
+                   $is_sra     ? $sra_rslt[31:0] :
+                   $is_srai    ? $srai_rslt[31:0] :
+                   $is_load    ? ($src1_value + $imm) :
+                   $is_s_instr ? ($src1_value + $imm) :
+                   32'b0;
+   
+   m4+dmem(32, 32, $reset, $result[6:2], $is_s_instr, $src2_value, $is_load, $ld_data[31:0])
+   $wr_data[31:0] = $is_load ? $ld_data : $result;
    
    
    `BOGUS_USE($imm_valid);
    `BOGUS_USE($is_sb $is_sh $is_sw);
-   `BOGUS_USE($is_load);
    
    // Assert these to end simulation (before Makerchip cycle limit).
    // *passed = 1'b0;
