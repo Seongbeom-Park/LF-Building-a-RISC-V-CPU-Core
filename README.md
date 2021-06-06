@@ -14,6 +14,7 @@ makerchip riscv.tlv
 ## Implementation plan
 ![RISC-V_CPU_Block_Diagram](images/RISC-V_CPU_Block_Diagram.png)
 
+### Chapter 4. RISC-V-Subset CPU
 <details>
   <summary>1. PC logic</summary>
   <img src="images/pc_logic/Initial_PC_logic.png">
@@ -83,4 +84,5 @@ makerchip riscv.tlv
   <img src="images/branch_logic/Branch_taken_logic_diagram.png">
 </details>
 
+### Chapter 5. Completing Your RISC-V CPU
 8. DMem
